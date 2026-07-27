@@ -1,0 +1,20 @@
+{
+  "name": "@pipeworx/mcp-fda-drug-competition",
+  "version": "0.1.0",
+  "description": "Orange Book competitive intelligence from FDA's monthly official data ZIP.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "keywords": ["mcp", "mcp-server", "model-context-protocol", "pipeworx", "fda-drug-competition"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pipeworx-io/mcp-fda-drug-competition"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

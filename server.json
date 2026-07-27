@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.pipeworx-io/fda-drug-competition",
+  "title": "Fda Drug Competition",
+  "description": "Orange Book competitive intelligence from FDA's monthly official data ZIP.",
+  "version": "0.1.0",
+  "websiteUrl": "https://pipeworx.io/packs/fda-drug-competition",
+  "repository": {
+    "url": "https://github.com/pipeworx-io/mcp-fda-drug-competition",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://gateway.pipeworx.io/fda-drug-competition/mcp"
+    }
+  ]
+}
