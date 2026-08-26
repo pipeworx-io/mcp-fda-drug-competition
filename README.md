@@ -1,24 +1,38 @@
-# mcp-fda-drug-competition
+# @pipeworx/fda-drug-competition
 
-Orange Book competitive intelligence from FDA's monthly official data ZIP.
+FDA drug-competition MCP for Orange Book small-molecule approvals, patents, and exclusivities plus Purple Book biologic and biosimilar licensure data.
 
-Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1394+ live data sources.
+Part of [Pipeworx](https://pipeworx.io) — an MCP gateway connecting AI agents to 1476+ live data sources.
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `orange_book_product_search` | Search FDA Orange Book products by ingredient, trade name, applicant, or application number. Returns NDA/ANDA status, therapeutic-equivalence codes, RLD/reference-standard flags, strength, route, and approval date. |
-| `orange_book_competition_profile` | Profile FDA Orange Book competition for an ingredient or trade name: matched applications/products, NDA versus ANDA holders, RLD/reference standards, patents, and exclusivities. Approved ANDAs indicate regulatory approval, not launch, supply, substitution, or market share. |
-| `orange_book_application_detail` | Retrieve all FDA Orange Book product, patent, and exclusivity rows for one NDA or ANDA application. Patent and exclusivity dates are FDA listings, not a legal conclusion about enforceability or actual generic entry. |
-| `orange_book_patent_expirations` | Find listed Orange Book patent expirations in a date window, optionally filtered by drug/applicant through matching product applications. Dates are sponsor-submitted FDA listings and do not establish freedom to operate or a certain launch date. |
-| `orange_book_exclusivity_expirations` | Find FDA Orange Book exclusivity expirations in a date window, optionally filtered by drug/applicant. Exclusivity codes have program-specific meanings; expiration alone does not guarantee generic approval or launch. |
-| `purple_book_product_search` | Search FDA Purple Book biologic products by proper/proprietary name, applicant, reference product, or BLA. Returns licensure and product-level attributes. A licensed biosimilar is not necessarily launched, available, interchangeable, or substitutable under state law. |
-| `purple_book_competition_profile` | Profile FDA-licensed biologic competition around a proper, proprietary, or reference-product name. Counts unique BLAs as sponsors/applications and separates reference products, biosimilars, and interchangeables. It does not measure launches, availability, sales, or market share. |
-| `purple_book_biosimilars` | List FDA-licensed 351(k) biosimilar and interchangeable products for an optional reference product, applicant, or product name. Approval/licensure does not establish commercial launch or current availability. |
-| `purple_book_interchangeables` | List FDA Purple Book products designated 351(k) Interchangeable, optionally filtered by reference product, applicant, or product name. Interchangeability is an FDA designation; pharmacy substitution remains subject to applicable law and circumstances. |
-| `purple_book_reference_product` | Find a reference biologic and its FDA-licensed 351(k) products by proper or proprietary name. Product rows and BLA counts must not be interpreted as market participants, launches, or market share. |
-| `purple_book_recent_changes` | Return the changes section of FDA’s latest monthly Purple Book report: N=newly approved, R=added in current release, U=updated. Updated or added does not necessarily mean newly licensed. |
+- `orange_book_product_search(...)` — search approved NDA and ANDA product rows by drug, applicant, or application.
+- `orange_book_competition_profile(...)` — profile NDA/ANDA applications, applicants, patents, and exclusivities for a drug.
+- `orange_book_application_detail(...)` — retrieve the products, patents, and exclusivities attached to one application.
+- `orange_book_patent_expirations(...)` — find listed patent expirations in a date window.
+- `orange_book_exclusivity_expirations(...)` — find regulatory-exclusivity expirations in a date window.
+- `orange_book_loss_of_exclusivity_profile(...)` — assemble reference applications, approved ANDAs, and active or elapsed patent/exclusivity ranges for LOE diligence.
+- `orange_book_generic_entry_timeline(...)` — show first approval timing for unique ANDA applications.
+- `orange_book_reference_drug_landscape(...)` — compare RLD/reference-standard designations and approved ANDAs by dosage form and route.
+- `orange_book_expiry_cliff_calendar(...)` — combine patent and exclusivity expirations into a drug-aware calendar.
+- `purple_book_product_search(...)` — search licensed biologic product rows by name, applicant, reference product, or BLA.
+- `purple_book_competition_profile(...)` — count reference, biosimilar, and interchangeable BLAs around a biologic.
+- `purple_book_biosimilars(...)` — list licensed 351(k) biosimilar and interchangeable products.
+- `purple_book_interchangeables(...)` — list products carrying FDA's interchangeable designation.
+- `purple_book_reference_product(...)` — connect a reference biologic to related licensed 351(k) products.
+- `purple_book_recent_changes(...)` — read the additions and updates in FDA's latest monthly report.
+- `purple_book_biosimilar_entry_timeline(...)` — show approval timing for unique 351(k) BLAs associated with a reference biologic.
+
+## Auth
+
+Keyless.
+
+## Data sources
+
+- <https://www.fda.gov/drugs/drug-approvals-and-databases/orange-book-data-files> — monthly product, patent, and exclusivity files for FDA-approved small-molecule drugs.
+- <https://purplebooksearch.fda.gov/downloads> — FDA's latest monthly Purple Book report for licensed biological products.
+
+Orange Book patent dates are sponsor-submitted listings, and regulatory approval dates do not establish launch, availability, sales, market share, patent enforceability, or a certain generic-entry date. RLD and reference-standard designations serve different FDA purposes. Purple Book interchangeability is an FDA designation; pharmacy substitution remains subject to applicable law and circumstances.
 
 ## Quick Start
 
@@ -34,7 +48,25 @@ Add to your MCP client (Claude Desktop, Cursor, Windsurf, etc.):
 }
 ```
 
-Or connect to the full Pipeworx gateway for access to all 1394+ data sources:
+### What this endpoint actually serves
+
+`tools/list` at `https://gateway.pipeworx.io/fda-drug-competition/mcp` returns the tools in the table
+above **plus the shared Pipeworx meta-tools** — `ask_pipeworx`,
+`discover_tools`, `search_within`, `remember`/`recall` and the rest of the
+gateway-wide set. So the tool count you see is larger than this table: a
+single-pack endpoint currently lists roughly 30 shared tools alongside the
+pack's own. The connection's `initialize` response states its exact scope, and
+is the authoritative answer for a given day.
+
+This is deliberate, not multiplexing by accident. The meta-tools are what let a
+scoped connection answer a question this pack does not cover — via
+`ask_pipeworx`, which routes across the whole catalog — without you adding a
+second MCP server. There is currently no way to mount a pack endpoint without
+them; if the extra schemas cost you more context than the routing is worth,
+connect to the full gateway once rather than to several pack endpoints.
+
+Or connect to the full Pipeworx gateway to get every pack's tools listed
+directly, instead of just this one's:
 
 ```json
 {
@@ -46,9 +78,14 @@ Or connect to the full Pipeworx gateway for access to all 1394+ data sources:
 }
 ```
 
+Both URLs reach the same gateway and the same 1476+ data sources. The
+only difference is which pack's tools are listed **directly**; `ask_pipeworx`
+reaches all of them from either one.
+
 ## Using with ask_pipeworx
 
-Instead of calling tools directly, you can ask questions in plain English:
+Instead of calling tools directly, you can ask questions in plain English —
+this works on the pack endpoint above as well as on the full gateway:
 
 ```
 ask_pipeworx({ question: "your question about Fda Drug Competition data" })
